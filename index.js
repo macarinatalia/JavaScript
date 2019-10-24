@@ -1,3 +1,8 @@
+// Example of interactions between customer, restaurant and food.
+// Customer can visit, rate restaurant and make an order. 
+// Restaurant has a menu.
+
+
 Customer = class {
     constructor (name){
         this.name = name
