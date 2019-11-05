@@ -1,1 +1,98 @@
-{"name":"John","orders":[],"restaurant":{"name":"McDonalds","address":"Alexanderpl.8","visitors":["John","Mary","Alex"],"menu":[],"reviews":[],"orders":["John",["burger","cola"],"Alex",["chips"],"Mary",["burger","cola","chips"]]}}
+[
+    {
+        "name": "John",
+        "orders": [],
+        "restaurant": {
+            "name": "McDonalds",
+            "address": "Alexanderpl.8",
+            "visitors": [
+                "John",
+                "Mary",
+                "Alex"
+            ],
+            "menu": [],
+            "reviews": [],
+            "orders": [
+                "John",
+                [
+                    "burger",
+                    "cola"
+                ],
+                "Alex",
+                [
+                    "chips"
+                ],
+                "Mary",
+                [
+                    "burger",
+                    "cola",
+                    "chips"
+                ]
+            ]
+        }
+    },
+    {
+        "name": "Alex",
+        "orders": [],
+        "restaurant": {
+            "name": "McDonalds",
+            "address": "Alexanderpl.8",
+            "visitors": [
+                "John",
+                "Mary",
+                "Alex"
+            ],
+            "menu": [],
+            "reviews": [],
+            "orders": [
+                "John",
+                [
+                    "burger",
+                    "cola"
+                ],
+                "Alex",
+                [
+                    "chips"
+                ],
+                "Mary",
+                [
+                    "burger",
+                    "cola",
+                    "chips"
+                ]
+            ]
+        }
+    },
+    {
+        "name": "Mary",
+        "orders": [],
+        "restaurant": {
+            "name": "McDonalds",
+            "address": "Alexanderpl.8",
+            "visitors": [
+                "John",
+                "Mary",
+                "Alex"
+            ],
+            "menu": [],
+            "reviews": [],
+            "orders": [
+                "John",
+                [
+                    "burger",
+                    "cola"
+                ],
+                "Alex",
+                [
+                    "chips"
+                ],
+                "Mary",
+                [
+                    "burger",
+                    "cola",
+                    "chips"
+                ]
+            ]
+        }
+    }
+]

@@ -1,4 +1,4 @@
-function fillDB(database){
+function loadData(database){
     const Visitor = require('./visitor')
     const Restaurant = require('./restaurant')
     const Menu = require('./menu')
@@ -19,17 +19,21 @@ function fillDB(database){
     mary.visit(mcdonalds)
     alex.visit(mcdonalds)
 
-    mcdonalds.createOrder(john,['burger','cola'])
-    mcdonalds.createOrder(alex,['chips'])
-    mcdonalds.createOrder(mary,['burger','cola','chips'])
+    mcdonalds.createOrder(john, ['burger','cola'])
+    mcdonalds.createOrder(alex, ['chips'])
+    mcdonalds.createOrder(mary, ['burger','cola','chips'])
 
     //mcdonalds.printOrder(mary)
     //alex.leaveRestaurant(mcdonalds)
 
-    database.save('restaurant.json',mcdonalds)
-    database.save('visitor.json',john)
-    database.save('menu.json',mcdonaldsMenu)
+    const visitors = [ john, alex, mary ]
+    const restaurants = [mcdonalds]
+    const menus = [mcdonaldsMenu]
+
+    database.save('restaurant.json', restaurants)
+    database.save('visitor.json', visitors)
+    database.save('menu.json', menus)
 
 }
 
-module.exports = {fillDB}
+module.exports = { loadData }
