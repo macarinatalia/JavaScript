@@ -1,0 +1,6 @@
+extends layout
+
+block content
+    h1 Number of visitors is #{visitors.length}
+    each visitor in visitors
+        p #{visitor.name} 

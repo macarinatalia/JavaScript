@@ -1,0 +1,6 @@
+extends layout
+
+block content
+    h1 Number of restaurants is #{allRestaurants.length}
+    each rest in allRestaurants
+        p #{rest.name}     #{rest.address}
