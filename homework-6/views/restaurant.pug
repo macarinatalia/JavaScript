@@ -1,0 +1,9 @@
+extends layout
+
+block content
+    h1  #{restaurant.name}
+    p Number of visitors: #{restaurant.visitors.legth}
+    p List of visitors:
+    each visitor in restaurant.visitors
+        p1 #{visitor.name} 
+        br
