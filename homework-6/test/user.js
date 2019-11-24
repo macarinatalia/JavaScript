@@ -79,14 +79,21 @@ import app from "../app"
 // })
 
 // test('Get list of restaurants located near user (search by index)' , async t => {
-//     const newUser = {
-//         name: 'Anna',
-//         address: 'Bossestr. 7',
-//         index: 10245
-//     }
+    
+//     t.plan(3)
+//     const newUser = {name: 'Anna', address: 'Bossestr. 7', index: 10245}
+//     const newRest = {name: 'Pi Pa Sa Pikante', address: 'Revaler Straße 8', index: 10245, reviews: []}
 
 //     const user = (await request(app).post('/user').send(newUser)).body
-//     const restaurants = 
+//     const restaurant = (await request(app).post('/restaurant').send(newRest)).body
+
+//     const allRestaurantsForUserJSON = (await request(app).get(`/user/${user._id}/restaurants/json`))
+//     t.is(allRestaurantsForUserJSON.status, 200)
+//     t.true(Array.isArray(allRestaurantsForUserJSON.body),'Body should be an array')
+//     t.true(allRestaurantsForUserJSON.body.length > 0)
+// })
+
+// test('Get list of reviews for user', async t =>{
 
 // })
 
@@ -99,9 +106,16 @@ test('Make review to a restaurant', async t => {
     const restaurant = (await request(app).post('/restaurant').send(newRest)).body
 
     //write a review
-    const reviewRes = await request(app)
-            .post(`/user/${user._id}/restaurant/${restaurant._id}/review`)
-            .send({name: 'Very nice place'})
+    // const reviewRes = await request(app)
+    //         .post(`/user/${user._id}/restaurant/${restaurant._id}/review`)
+    //         .send({name: 'Very nice place'})
+
+    t.log('write a review')
+    const url = `/user/${user._id}/restaurant/${restaurant._id}/review`
+    const review = { name: 'Very nice place' }
+    const reviewRes = await request(app).post(url, review)
+
+
     
     t.log(reviewRes)
     t.is(reviewRes.status, 200)
@@ -116,3 +130,22 @@ test('Make review to a restaurant', async t => {
     // t.deepEqual(fetchReview.body.restaurant, restaurant._id)
 
 })
+
+// test('User makes an order in specific restaurant', async t => {
+//     t.plan(1)
+//     const newUser = {name: 'Anna', address: 'Bossestr. 7', index: 10245}
+//     const newRest = {name: 'Pi Pa Sa Pikante', address: 'Revaler Straße 8', index: 10245, reviews: []}
+
+//     const user = (await request(app).post('/user').send(newUser)).body
+//     const restaurant = (await request(app).post('/restaurant').send(newRest)).body
+
+//     const newFood = {name: 'Chips', ingridietns: 'potatoes, oil'}
+//     const food = (await request(app).post('/food').send(newFood)).body
+
+//     const orderRes = await request(app)
+//         .post(`/user/${user._id}/restaurant/${restaurant._id}/order`)
+//         .send({food: [food._id]})
+    
+//     t.is(orderRes.status, 200)
+
+// })

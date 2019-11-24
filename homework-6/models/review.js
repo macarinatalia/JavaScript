@@ -2,8 +2,8 @@ const mongoose = require('mongoose')
 
 const ReviewSchema = mongoose.Schema({
     name: {
-        type: String,
-        required: true
+        type: String//,
+        //required: true
     },
     restaurant: {
         type: mongoose.SchemaTypes.ObjectId,
