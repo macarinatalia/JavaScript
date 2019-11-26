@@ -9,9 +9,21 @@ router.get('/all', async(req, res) => {
     res.render(__dirname + '/../views/list', { items : food })
 })
 
+router.get('/all/json', async (req, res) => {
+    const food = await FoodService.findAll()
+    res.send(food)
+})
+
 router.get('/:id', async(req, res) => {
     const food = await FoodService.find(req.params.id)
-    res.render('base', { data : food })
+    if (!food) res.status(404)
+    res.render(__dirname + '/../views/data', { data : food })
+})
+
+router.get('/:id/json', async (req, res) => {
+    const food = await FoodService.find(req.params.id)
+    if (!food) res.status(404)
+    res.send(food)
 })
 
 router.post('/', async(req, res) => {
@@ -19,10 +31,14 @@ router.post('/', async(req, res) => {
     res.send(food)
 })
 
-
-router.delete('/all', async(req, res) => {
-    await FoodService.delAll()
-    res.send('all food was deleted')
+router.delete('/:id', async(req, res) => {
+    const food = await FoodService.del(req.params.id)
+    res.send(food)
 })
+
+// router.delete('/all', async(req, res) => {
+//     await FoodService.delAll()
+//     res.send('all food was deleted')
+// })
 
 module.exports = router

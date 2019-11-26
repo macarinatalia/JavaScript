@@ -4,39 +4,39 @@ const RestaurantSchema = mongoose.Schema({
     name: {
         type: String,
         required: true,
-        minlenght: 3
+        minlength: 3
     },
     address: String,
     index: {
         type: Number,
         required: true,
-        minlenght: 5
+        minlength: 5
     },
     visitors: [{
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'User',
-        autopopulates: {
+        autopopulate: {
             maxDepth: 1
         }
     }],
     menu: {
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'Menu',
-        autopopulates: {
+        autopopulate: {
             maxDepth: 1
         }
     },
     reviews: [{
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'Review',
-        autopopulates: {
+        autopopulate: {
             maxDepth: 1
         }
     }],
     orders: [{
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'Order',
-        autopopulates: {
+        autopopulate: {
             maxDepth: 1
         }
     }]

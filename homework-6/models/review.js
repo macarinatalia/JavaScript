@@ -8,7 +8,7 @@ const ReviewSchema = mongoose.Schema({
     restaurant: {
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'Restaurant',
-        autopopulates: {
+        autopopulate: {
             maxDepth: 1
         },
         required: true
@@ -16,7 +16,7 @@ const ReviewSchema = mongoose.Schema({
     user: {
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'User',
-        autopopulates: {
+        autopopulate: {
             maxDepth: 1
         },
         required: true

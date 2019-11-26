@@ -8,6 +8,8 @@ const FoodService = require('../services/food-service')
 const UserService = require('../services/user-service')
 const ReviewService = require('../services/review-service')
 
+let status = 500  // 406 - Not acceptable
+
 router.get('/all', async(req, res) => {
     var restaurants = await RestaurantService.findAll()
     res.render(__dirname + '/../views/list', { items : restaurants })
@@ -20,7 +22,11 @@ router.get('/all/json', async (req, res) => {
 
 router.get('/:id', async(req, res) => {
     var restaurant = await RestaurantService.find(req.params.id)
-    res.render(__dirname + '/../views/restaurant', { restaurant : restaurant })
+    if (!restaurant) {
+        res.status(404)
+        res.render(__dirname + '/../views/nofound')
+    }
+    else res.render(__dirname + '/../views/restaurant', { restaurant : restaurant })
 })
 
 router.get('/:id/json', async (req, res) => {
@@ -33,21 +39,53 @@ router.get('/:id/json', async (req, res) => {
 router.get('/:id/visitors', async(req, res) => {
     try{
         const restaurant = await RestaurantService.find(req.params.id)
-        const users = []
-        for (var i = 0; i < restaurant.visitors.length; i++) {
-          const f = await UserService.find(restaurant.visitors[i]._id)
-          users.push(f)
+        if (!restaurant) {
+            const er = new Error('No restaurant with id : ' + req.params.id)
+            status = 404
+            throw er
         }
+        status = 500
+        //extract user ids
+        const userIds = []
+        restaurant.visitors.forEach(user => {
+            userIds.push(user.id)
+        });
+        const userParam = { _id : { $in : userIds}}
+        const users = await UserService.findByParameter(userParam)
+
         res.render(__dirname + '/../views/list', { items : users })
     } catch(err) {
-        console.error(err.message);
-        res.status(500).send("Server Error: Failed to get all visitors.");
+        res.status(status).send(err.message);
     }
    
 })
 //http://localhost:3000/restaurant/5dd1413751db4776931cd849/visitors
 
-//get list of restaurant searched by postalcode
+router.get('/:id/visitors/json', async(req, res) => {
+    try{
+        const restaurant = await RestaurantService.find(req.params.id)
+        if (!restaurant) {
+            const er = new Error('No restaurant with id : ' + req.params.id)
+            status = 404
+            throw er
+        }
+        status = 500
+        //extract user ids
+        const userIds = []
+        restaurant.visitors.forEach(user => {
+            userIds.push(user.id)
+        });
+        const userParam = { _id : { $in : userIds}}
+        const users = await UserService.findByParameter(userParam)
+        res.send(users)
+    } catch(err) {
+        res.status(status).send(err.message);
+    }
+   
+})
+
+
+//get list of restaurants searched by postalcode
 router.get('/postal/:postalcode', async(req, res) => {
     const restaurant = await RestaurantService.getAllRestaurantsByPostalCode(req.params.postalcode)
     res.render(__dirname + '/../views/list', { items : restaurant })
@@ -55,38 +93,93 @@ router.get('/postal/:postalcode', async(req, res) => {
 
 //http://localhost:3000/restaurant/postal/10245
 
+router.get('/postal/:postalcode/json', async(req, res) => {
+    const restaurant = await RestaurantService.getAllRestaurantsByPostalCode(req.params.postalcode)
+    res.send(restaurant)
+}) 
+
 //get list of reviews for restaurant
 router.get('/:id/reviews', async(req, res) => {
     try {
-        const reviews = await ReviewService.getAllReviews(req.params.id, 'restaurant', RestaurantService)
         const object = await RestaurantService.find(req.params.id)
+        if (!object) {
+            const er = new Error('No restaurant with id : ' + req.params.id)
+            status = 404
+            throw er
+        }
+        status = 500
+        const reviews = await ReviewService.getAllReviews(req.params.id, 'restaurant', RestaurantService)
         res.render(__dirname + '/../views/review', { object : object, reviews : reviews, moment: moment  })
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send("Server Error: Failed to get list of reviews.");
-    }
-    
+        res.status(status).send(err.message)
+    }  
 }) 
 
 // http://localhost:3000/restaurant/5dd1958034c8327e643e011a/reviews
 
+router.get('/:id/reviews/json', async(req, res) => {
+    try {
+        const object = await RestaurantService.find(req.params.id)
+        if (!object) {
+            const er = new Error('No restaurant with id : ' + req.params.id)
+            status = 404
+            throw er
+        }
+        status = 500
+        const reviews = await ReviewService.getAllReviews(req.params.id, 'restaurant', RestaurantService)
+        res.send(reviews)
+    } catch (err) {
+        res.status(status).send(err.message)
+    }  
+}) 
 
-//print menu for the restaurant
+//get menu for the restaurant
 router.get('/:id/menu', async(req, res) => {
     try {
         const restaurant = await RestaurantService.find(req.params.id)
-    if (restaurant.menu == undefined) res.render(__dirname + '/../views/nofound')
-    else {
-        const menu = await MenuService.find(restaurant.menu._id)
-        res.render(__dirname + '/../views/menu', { menu : menu })
-    }
+        if (!restaurant) {
+            const er = new Error('No restaurant with id : ' + req.params.id)
+            status = 404
+            throw er
+        }
+        if (restaurant.menu) {
+            status = 500
+            const menu = await MenuService.find(restaurant.menu._id)
+            res.render(__dirname + '/../views/menu', { menu : menu })
+        }
+        else{
+            const er = new Error('No menu for restaurant with id : ' + req.params.id)
+            status = 404
+            throw er
+        }
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send("Server Error: Failed to print menu");
+        res.status(status).send(err.message)//"Server Error: Failed to print menu");
     }
-    
 })
 //http://localhost:3000/restaurant/5dd1958034c8327e643e011a/menu
+
+router.get('/:id/menu/json', async(req, res) => {
+    try {
+        const restaurant = await RestaurantService.find(req.params.id)
+        if (!restaurant) {
+            const er = new Error('No restaurant with id : ' + req.params.id)
+            status = 404
+            throw er
+        }
+        if (restaurant.menu) {
+            status = 500
+            const menu = await MenuService.find(restaurant.menu._id)
+            res.send(menu)
+        }
+        else{
+            const er = new Error('No menu for restaurant with id : ' + req.params.id)
+            status = 404
+            throw er
+        }
+    } catch (err) {
+        res.status(status).send(err.message)//"Server Error: Failed to print menu");
+    }
+})
 
 
 router.post('/', async(req, res) => {
@@ -103,24 +196,41 @@ router.post('/:restId/menu', async(req, res) => {
             const menuPrice = req.body.price
             const foodList = await FoodService.getFoodArrayByIds(menuFood)
             const menu = await MenuService.createMenu(rest, foodList, menuPrice)
+            
+            await RestaurantService.update(rest.id, {menu: menu})
             res.send(menu)
         }
-        else throw new Error('This restaurant already has a menu') 
+        else {
+            const er = new Error('This restaurant already has a menu') 
+            status = 406 
+            throw er
+        }
     } catch (err) {
-        console.error(err.message);
-        res.status(500).send("Server Error: Failed to create menu");
+        res.status(status).send(err.message)//"Server Error: Failed to create menu");
     }
     
 })
 
-//axios.post('/restaurant/5dd1958034c8327e643e011a/menu',{food: ['5dd1414251db4776931cd84a', '5dd1414251db4776931cd84b'], price: ['2.0', '3,0']}).then(console.log)
+//axios.post('/restaurant/5ddaeea973f8c31e6f2dd7d5/menu',{food: ['5ddaef2273f8c31e6f2dd7d6', '5ddaef3173f8c31e6f2dd7d7'], price: ['2.0', '3,0']}).then(console.log)
 
 
 //update details
 router.post('/:id/update', async(req, res) => {
-    const rest = await RestaurantService.find(req.params.id)
-    await RestaurantService.update(req.params.id, req.body)
-    res.send(rest.name + ' was updated')
+    try {
+        const rest = await RestaurantService.find(req.params.id)
+        if(!rest) {
+            const er = new Error('No restaurant with id : ' + req.params.id)
+            status = 404
+            throw er
+        }
+        else{
+            await RestaurantService.update(req.params.id, req.body)
+            res.send(rest.name + ' was updated')
+        }
+    } catch (err) {
+        res.status(status).send(err.message)
+    }
+    
 })
 
 router.delete('/:id', async(req, res) => {
@@ -128,18 +238,29 @@ router.delete('/:id', async(req, res) => {
     res.send(restaurant)
 })
 
-router.delete('/all', async(req, res) => {
-    await RestaurantService.delAll()
-    res.send('all restaurants deleted')
-})
+// router.delete('/all', async(req, res) => {
+//     await RestaurantService.delAll()
+//     res.send('all restaurants deleted')
+// })
 
 //delete menu for restaurant
 router.delete('/:restId/menu', async(req, res) => {
-    const rest = await RestaurantService.find(req.params.restId).catch((err) => console.log(err))
-    await MenuService.del(rest.menu)
-    rest.menu = null
-    await rest.save()
-    res.send('menu deleted')
+    try {
+        const rest = await RestaurantService.find(req.params.restId)
+        if(!rest) {
+            const er = new Error('No restaurant with id : ' + req.params.id)
+            status = 404
+            throw er
+        }
+        else{
+            status = 500
+            await MenuService.del(rest.menu)
+            await RestaurantService.update(rest.id, { menu : null })
+            res.send('menu deleted')
+        }
+    } catch (err) {
+        res.status(status).send(err.message)
+    }
 })
 
 //axios.delete('/restaurant/5dd1958034c8327e643e011a/menu').then(console.log)

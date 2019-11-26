@@ -4,7 +4,7 @@ const FoodSchema = mongoose.Schema({
     name: {
         type: String,
         required: true,
-        minlenght: 3
+        minlength: 3
     },
     ingridients: {
         type: [],

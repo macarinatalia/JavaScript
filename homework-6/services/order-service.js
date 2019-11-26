@@ -7,11 +7,11 @@ class OrderService extends BaseService {
 
     async createNewOrder(user, restaurant, food) {
         const order = await this.add({user: user, restaurant: restaurant, food: food})
-        user.orders.push(order)
-        restaurant.orders.push(order)
-        restaurant.visitors.push(user)
-        await user.save()
-        await restaurant.save()
+        // user.orders.push(order)
+        // restaurant.orders.push(order)
+        // restaurant.visitors.push(user)
+        // await user.save()
+        // await restaurant.save()
         return order
     }
 }

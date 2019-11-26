@@ -5,18 +5,25 @@ const UserSchema = mongoose.Schema({
     name: {
         type: String,
         required: true,
-        minlenght: 2
+        minlength: 2
     },
     address: String,
     index: {
         type: Number,
         required: true,
-        minlenght: 5
+        minlength: 5
     },
     orders: [{
         type: mongoose.SchemaTypes.ObjectId,
         ref: 'Order',
-        autopopulates: {
+        autopopulate: {
+            maxDepth: 1
+        }
+    }],
+    reviews: [{
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: 'Review',
+        autopopulate: {
             maxDepth: 1
         }
     }]

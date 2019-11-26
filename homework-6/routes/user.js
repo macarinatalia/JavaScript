@@ -8,6 +8,8 @@ const OrderService = require('../services/order-service')
 const FoodService = require('../services/food-service')
 const ReviewService = require('../services/review-service.js')
 
+let status = 500  // 406 - Not acceptable
+
 router.get('/all', async(req, res) => {
     var users = await UserService.findAll()
     res.render(__dirname + '/../views/list', { items : users })
@@ -20,7 +22,10 @@ router.get('/all/json', async (req, res) => {
 
 router.get('/:id', async(req, res) => {
     const user = await UserService.find(req.params.id)
-    if (!user) res.status(404)
+    if (!user) {
+        res.status(404)
+        res.render(__dirname + '/../views/nofound')
+    }
     else res.render(__dirname + '/../views/user', { user : user, orders: user.orders })
 })
 
@@ -32,13 +37,36 @@ router.get('/:id/json', async (req, res) => {
 
 //get list of restaurants located near user (search by index)
 router.get('/:id/restaurants', async(req, res) => {
+    const userId = req.params.id
     try{
-        const user = await UserService.find(req.params.id)
+        const user = await UserService.find(userId)
+        if (!user) {
+            const er = new Error('No user with id : ' + userId)
+            status = 404
+            throw er
+        }
+        status = 500
         const restaurant = await RestaurantService.getAllRestaurantsByPostalCode(user.index)
         res.render(__dirname + '/../views/list', { items : restaurant })
     } catch(err) {
-        console.error(err.message);
-        res.status(500).send("Server Error: Failed to get list of  restaurants.");
+        res.status(status).send(err.message)
+    }  
+})
+
+router.get('/:id/restaurants/json', async(req, res) => {
+    const userId = req.params.id
+    try{
+        const user = await UserService.find(userId)
+        if (!user) {
+            const er = new Error('No user with id : ' + userId)
+            status = 404
+            throw er
+        }
+        status = 500
+        const restaurant = await RestaurantService.getAllRestaurantsByPostalCode(user.index)
+        res.send(restaurant)
+    } catch(err) {
+        res.status(status).send(err.message)
     }  
 })
 
@@ -46,19 +74,37 @@ router.get('/:id/restaurants', async(req, res) => {
 
 //get list of reviews for user
 router.get('/:id/reviews', async(req, res) => {
-
     try{
-        const reviews = await ReviewService.getAllReviews(req.params.id, 'user', UserService)
         const object = await UserService.find(req.params.id)
+        if (!object) {
+            const er = new Error('No user with id : ' + req.params.id)
+            status = 404
+            throw er
+        }
+        status = 500
+        const reviews = await ReviewService.getAllReviews(req.params.id, 'user', UserService)
         res.render(__dirname + '/../views/review', { object : object, reviews : reviews, moment: moment  })
     } catch(err) {
-        console.error(err.message);
-        res.status(500).send("Server Error: Failed to get list of user reviews.");
+        res.status(status).send(err.message)
     }
-    
 })
 
 // /user/5dd1412c51db4776931cd848/reviews
+router.get('/:id/reviews/json', async(req, res) => {
+    try{
+        const object = await UserService.find(req.params.id)
+        if (!object) {
+            const er = new Error('No user with id : ' + req.params.id)
+            status = 404
+            throw er
+        }
+        status = 500
+        const reviews = await ReviewService.getAllReviews(req.params.id, 'user', UserService)
+        res.send(reviews) 
+    } catch(err) {
+        res.status(status).send(err.message)
+    }
+})
 
 //axios.post('/user', {name:'Elsa', index: 10245}).then(console.log)
 router.post('/', async(req, res) => {
@@ -70,14 +116,22 @@ router.post('/', async(req, res) => {
 router.post('/:userId/restaurant/:restId/review', async(req, res) => {
     const { userId, restId } = req.params
     try{
-        const user = await UserService.find(req.params.userId)
-        const rest = await RestaurantService.find(req.params.restId)
+        const user = await UserService.find(userId)
+        const rest = await RestaurantService.find(restId)
         const review = req.body
+        if(!user || !rest){
+            const er = new Error('No such object')
+            status = 404
+            throw er
+        }
+        status = 500
         const reviewFinal = await ReviewService.createReview(rest, user, review)
+        await RestaurantService.update(rest.id, {$push: {reviews: reviewFinal}})
+        await UserService.update(user.id, {$push: {reviews: reviewFinal}})
+        
         res.send(reviewFinal)
     }catch(err) {
-        console.error(err.message);
-        res.status(500).send(err.message);//"Server Error: Failed to make a review.");
+        res.status(status).send(err.message)
     }
     
 })
@@ -89,14 +143,23 @@ router.post("/:userId/restaurant/:restId/order", async (req, res) => {
     const { userId, restId } = req.params;
   
     try {
-      const user = await UserService.find(userId);
-      const rest = await RestaurantService.find(restId);
-      const food = await FoodService.getFoodArrayByIds(req.body.food);
-      const order = await OrderService.createNewOrder(user, rest, food);
-      res.send(order);
+        const user = await UserService.find(userId);
+        const rest = await RestaurantService.find(restId);
+
+        if(!user || !rest){
+            const er = new Error('No such object')
+            status = 404
+            throw er
+        }
+        status = 500
+        const food = await FoodService.getFoodArrayByIds(req.body.food);
+        const order = await OrderService.createNewOrder(user, rest, food);
+
+        await RestaurantService.update(rest.id,{ $push: {orders: order, visitors: user}})
+        await UserService.update(user.id,{ $push: {orders: order}})
+        res.send(order);
     } catch (err) {
-      console.error(err.message);
-      res.status(500).send("Server Error: Failed to create an order.");
+        res.status(status).send(err.message)
     }
   });
 
@@ -109,7 +172,8 @@ router.post("/:userId/restaurant/:restId/order", async (req, res) => {
 router.post('/:id/update', async(req, res) => {
     const user = await UserService.find(req.params.id)
     await UserService.update(req.params.id, req.body)
-    res.send('user ' + user.name + ' was updated')
+    const userOne = await UserService.find(req.params.id)
+    res.send('user ' + userOne.name + ' was updated with ' + userOne.address)
 })
 
 //axios.post('/user/5dd1412051db4776931cd847', {address: 'CVC'}).then(console.log)
@@ -119,10 +183,10 @@ router.delete('/:id', async(req, res) => {
     res.send(user)
 })
 
-router.delete('/all', async(req, res) => {
-    await UserService.delAll()
-    res.send('all users were deleted')
-})
+// router.delete('/all', async(req, res) => {
+//     await UserService.delAll()
+//     res.send('all users were deleted')
+// })
 
 
 module.exports = router

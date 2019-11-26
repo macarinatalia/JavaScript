@@ -30,6 +30,8 @@ Online food service offers to the users to order food from a restaurant and to w
 
 [localhost:3000](http://localhost:3000/)
 
+RUN: `nodemon index.js`
+
 ### Interactions
 
 Routes (URL's) that we need for website' pages to display, where `object`is name of the model, `id` is unique identifier that is given for each instance in the model.
@@ -90,8 +92,17 @@ Routes (URL's) that we need for website' pages to display, where `object`is name
     - `http://localhost:3000/user/:id/reviews`
 
 
+### Testing
 
-#### TODO
+Test are added for the routes.
+RUN:  `npm run test`
+
+To see the coverage of written tests must run `npm run test-coverage`
+
+
+### TODO
 1. Add status to order (OPEN, CLOSED)
 2. User can make order only from the food from menu of the restaurant
 3. User sign in/ log in/ log out 
+4. Make a delete all function 
+5. If you delete menu, delete also reference from restaurant (same in other models)

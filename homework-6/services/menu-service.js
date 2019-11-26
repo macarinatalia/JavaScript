@@ -6,18 +6,19 @@ class MenuService extends BaseService {
 
     async createMenu(restaurant, food, price) {
         const name = restaurant.name + ' Menu'
-        restaurant.menu = await this.add({
-                            name: name, 
-                            restaurant: restaurant, 
-                            food: food,
-                            price: price
-                        }).catch((err) => console.log(err));
-        await restaurant.save()
+        const menuParam = {
+            name: name, 
+            restaurant: restaurant, 
+            food: food,
+            price: price
+        }
+        const menu = await this.add(menuParam).catch((err) => console.log(err));
+        return menu
     }
 
-    async changePrice(food, newPrice){
+    // async changePrice(food, newPrice){
 
-    }
+    // }
 }
 
 module.exports = new MenuService()

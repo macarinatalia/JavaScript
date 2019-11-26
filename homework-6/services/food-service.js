@@ -5,13 +5,9 @@ class FoodService extends BaseService {
     model = FoodModel
 
     async getFoodArrayByIds(foodIds){
-        const foodList = []
-        for (var i = 0; i < foodIds.length; i++) {
-            const f = await this.find(foodIds[i]).catch((err) => console.log(err));
-            foodList.push(f)
-        }
-        
-        return foodList
+        const param = { _id : { $in : foodIds }}
+        const result =  await this.findByParameter( param )
+        return result
     }
 }
 

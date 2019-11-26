@@ -26,8 +26,6 @@ app.use('/review', reviewRouter)
 app.set('view engine', 'pug')
 
 app.get('/', (req, res) => {
-    //res.send('hello')
-    //res.sendFile(__dirname + '/index.html')  //send files
     res.render('index')
 })
 

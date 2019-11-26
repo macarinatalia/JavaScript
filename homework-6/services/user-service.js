@@ -5,17 +5,17 @@ const RestaurantService = require('../services/restaurant-service')
 class UserService extends BaseService {
     model = UserModel
 
-    async getAllRestaurants(user){
-        const restaurants = await RestaurantService.findAll()
+    // async getAllRestaurants(user){
+    //     const restaurants = await RestaurantService.findAll()
 
-        var result = []
-        restaurants.forEach(element => {
-            if (element.index === user.index ) 
-                result.push(element)
-        });
+    //     var result = []
+    //     restaurants.forEach(element => {
+    //         if (element.index === user.index ) 
+    //             result.push(element)
+    //     });
 
-        return result
-    }
+    //     return result
+    // }
 }
 
 module.exports = new UserService()

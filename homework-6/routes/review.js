@@ -16,14 +16,14 @@ router.get('/all/json', async (req, res) => {
 
 router.get('/:id', async(req, res) => {
     const review = await ReviewService.find(req.params.id)
-    res.render('base', { data : review })
+    res.render(__dirname + '/../views/data', { data : review })
 })
 
 router.get('/:id/json', async (req, res) => {
     const review = await ReviewService.find(req.params.id)
     if (!review) res.status(404)
     res.send(review)
-  })
+})
 
 router.post('/', async(req, res) => {
     const review = await ReviewService.add(req.body)
@@ -31,9 +31,14 @@ router.post('/', async(req, res) => {
 })
 
 
-router.delete('/all', async(req, res) => {
-    await ReviewService.delAll()
-    res.send('all food was deleted')
+router.delete('/:id', async(req, res) => {
+    const review = await ReviewService.del(req.params.id)
+    res.send(review)
 })
+
+// router.delete('/all', async(req, res) => {
+//     await ReviewService.delAll()
+//     res.send('all reviews were deleted')
+// })
 
 module.exports = router

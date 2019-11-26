@@ -27,8 +27,6 @@ module.exports = class Service {
     return this.model.find(param)
   }
 
-
-
   async update(itemId, itemBody){
     return this.model.updateOne({ _id: itemId }, itemBody, { new : true})
   }

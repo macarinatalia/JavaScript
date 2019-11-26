@@ -9,22 +9,15 @@ class ReviewService extends BaseService {
         rev.user = user
         rev.date = new Date().toLocaleString()
         const review = await this.add(rev)
-        restaurant.reviews.push(review)
-        await restaurant.save()
+        //restaurant.reviews.push(review)
+        //await restaurant.save()
 
         return review
     }
 
     async getAllReviews(id, objectName, service){
         const reviews = await this.findAll()
-        const object = await service.find(id)
-
-        var result = []
-        for (var i = 0; i < reviews.length; i++) { 
-            if (reviews[i][objectName] == object.id){
-                result.push(reviews[i])
-            }
-        }
+        const result =  await this.findByParameter( { [objectName]: { _id : id }} )
         return result
     }
 }
