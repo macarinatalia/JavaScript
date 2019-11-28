@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const Enums = require('../helpers/enums')
 
 const OrderSchema = mongoose.Schema({
     user: {
@@ -21,9 +22,13 @@ const OrderSchema = mongoose.Schema({
         autopopulate: {
             maxDepth: 1
         }
-    }]
+    }],
+    status: {
+        type: String,
+        enum: Object.values(Enums.OrderStatus),
+        required: true,
+    }
 })
-
 
 
 OrderSchema.plugin(require('mongoose-autopopulate'))

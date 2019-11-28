@@ -15,9 +15,9 @@ module.exports = class Service {
     return this.model.deleteOne({ _id: itemId})
   }
 
-  async  delAll() {
-    return this.model.deleteMany()
-  }
+  // async  delAll() {
+  //   return this.model.deleteMany()
+  // }
 
   async find(itemId) {
     return this.model.findById(itemId)

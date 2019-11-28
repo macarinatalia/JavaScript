@@ -78,7 +78,7 @@ Routes (URL's) that we need for website' pages to display, where `object`is name
 
 #### User
 1. User makes an order in specific restaurant (create new order)
-    - `axios.post('/user/:userId/restaurant/:restId/order',{ food: [':id1', ':id2',] }).then(console.log)`
+    - `axios.post('/user/:userId/restaurant/:restId/order',{ food: [':id1', ':id2', ...] }).then(console.log)`
 2. User adds review to restaurant
     - `axios.post('/user/:id/restaurant/:id/review',{name: 'cool restaurant'}).then(console.log)`
 3. Get reviews for the user
@@ -91,6 +91,9 @@ Routes (URL's) that we need for website' pages to display, where `object`is name
 1. Get all reviews for object (restaurant, user)
     - `http://localhost:3000/user/:id/reviews`
 
+#### Order
+1. Get orders searched by status
+    - `http://localhost:3000/order/status/open`
 
 ### Testing
 
@@ -101,8 +104,7 @@ To see the coverage of written tests must run `npm run test-coverage`
 
 
 ### TODO
-1. Add status to order (OPEN, CLOSED)
-2. User can make order only from the food from menu of the restaurant
-3. User sign in/ log in/ log out 
-4. Make a delete all function 
-5. If you delete menu, delete also reference from restaurant (same in other models)
+
+1. User can make order only from the food from menu of the restaurant
+2. User sign in/ log in/ log out 
+3. Make a delete all function 

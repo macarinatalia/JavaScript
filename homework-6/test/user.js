@@ -2,6 +2,8 @@ import test from 'ava'
 import request from 'supertest'
 import app from "../app"
 
+const Enums = require('../helpers/enums')
+
 const userToCreate = {
     name: 'Alice',
     address: 'Warschauerstr. 66',
@@ -193,7 +195,7 @@ test('Make review to a restaurant', async t => {
 })
 
 test('User makes an order in specific restaurant', async t => {
-    t.plan(15)
+    t.plan(16)
     const user = (await request(app).post('/user').send(userToCreate)).body
     const restaurant = (await request(app).post('/restaurant').send(restToCreate)).body
 
@@ -206,6 +208,7 @@ test('User makes an order in specific restaurant', async t => {
         .send(orderParams)
     
     t.is(orderRes.status, 200)
+    t.is(orderRes.body.status, Enums.OrderStatus.OPEN)
     const order = orderRes.body
 
     //fetch same user and restaurant again
@@ -244,15 +247,47 @@ test('User makes an order in specific restaurant', async t => {
     t.is(orderAgain_2_Res.status, 404)
 })
 
+test('User cancel order', async t => {
+    t.plan(7)
+
+    const user = (await request(app).post('/user').send(userToCreate)).body
+    const restaurant = (await request(app).post('/restaurant').send(restToCreate)).body
+
+    const food_1 = (await request(app).post('/food').send(foodToCreate_1)).body
+
+    const orderParams = {food : [food_1]}
+    const orderRes = await request(app)
+        .post(`/user/${user._id}/restaurant/${restaurant._id}/order`)
+        .send(orderParams)
+    
+    t.is(orderRes.status, 200)
+    t.is(orderRes.body.status, Enums.OrderStatus.OPEN)
+    const order = orderRes.body
+
+    //cancel order
+    const orderCancelRes = await request(app)
+        .post(`/user/${user._id}/order/${order._id}/cancel`)
+    t.is(orderCancelRes.status, 200)
+    t.is(orderCancelRes.body.status, Enums.OrderStatus.CANCELLED)
+
+    //delete user
+    const deleteUserRes = await request(app).delete(`/user/${user._id}`)
+    t.is(deleteUserRes.status, 200)
+    t.is(deleteUserRes.ok, true)
+
+    //update order again
+    const orderCancelAgainRes = await request(app)
+        .post(`/user/${user._id}/order/${order._id}/cancel`)
+    t.is(orderCancelAgainRes.status, 404)
+})
+
 test('Update user info', async t => {
     t.plan(2)
     const user = (await request(app).post('/user').send(userToCreate)).body
-
-    const url = `/user/${user._id}/update`
-    const update = {address: 'CVC'}
-    const userToUpdate = await request(app).post(url).send(update)
+    const updateParam = {address: 'CVC'}
+    const userToUpdate = await request(app).post(`/user/${user._id}/update`).send(updateParam)
     t.is(userToUpdate.status, 200)
 
     const userResultJSON = await request(app).get(`/user/${user._id}/json`)
-    t.deepEqual(userResultJSON.body.address, update.address)
+    t.deepEqual(userResultJSON.body.address, updateParam.address)
 })

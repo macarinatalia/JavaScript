@@ -83,7 +83,7 @@ test('Delete an order', async t => {
 })
 
 
-test('Get list of menus', async t => {
+test('Get list of orders', async t => {
     t.plan(4)
     
     const order = (await setInfo(userToCreate, restToCreate, [foodToCreate_1, foodToCreate_2], orderToCreate)).body
@@ -95,5 +95,16 @@ test('Get list of menus', async t => {
     t.is(allOrdersJSON.status, 200)
     t.true(Array.isArray(allOrdersJSON.body),'Body should be an array')
     t.true(allOrdersJSON.body.length > 0)
+
+})
+
+test('Get orders searched by status', async t => {
+    t.plan(3)
+    const order = (await request(app).post('/order').send(orderToCreate)).body
+    
+    const allOrders = (await request(app).get(`/order/status/${order.status}`))
+    t.is(allOrders.status, 200)
+    t.true(Array.isArray(allOrders.body),'Body should be an array')
+    t.true(allOrders.body.length > 0)
 
 })

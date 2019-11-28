@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 
 const MenuService = require('../services/menu-service')
+const RestaurantService = require('../services/restaurant-service')
 
 
 router.get('/all', async(req, res) => {
@@ -31,13 +32,9 @@ router.post('/', async(req, res) => {
 })
 
 router.delete('/:id', async(req, res) => {
-    const menu = await MenuService.del(req.params.id)
-    res.send(menu)
+    await MenuService.del(req.params.id)
+    res.send('menu with id : ' + req.params.id + ' was deleted')
 })
 
-// router.delete('/all', async(req, res) => {
-//     await MenuService.delAll()
-//     res.send('all menus were deleted')
-// })
 
 module.exports = router

@@ -155,8 +155,8 @@ router.post("/:userId/restaurant/:restId/order", async (req, res) => {
         const food = await FoodService.getFoodArrayByIds(req.body.food);
         const order = await OrderService.createNewOrder(user, rest, food);
 
-        await RestaurantService.update(rest.id,{ $push: {orders: order, visitors: user}})
-        await UserService.update(user.id,{ $push: {orders: order}})
+        // await RestaurantService.update(rest.id,{ $push: {orders: order, visitors: user}})
+        // await UserService.update(user.id,{ $push: {orders: order}})
         res.send(order);
     } catch (err) {
         res.status(status).send(err.message)
@@ -168,15 +168,39 @@ router.post("/:userId/restaurant/:restId/order", async (req, res) => {
 //         }).then(console.log)
 
 
+//axios.post('/user/5dd1412051db4776931cd847', {address: 'CVC'}).then(console.log)
+
+//user cancel an order 
+router.post("/:userId/order/:orderId/cancel", async (req, res) => {
+    const { userId, orderId } = req.params;
+  
+    try {
+        const user = await UserService.find(userId);
+        const order = await OrderService.find(orderId);
+
+        if(!user || !orderId){
+            const er = new Error('No such object')
+            status = 404
+            throw er
+        }
+        status = 500
+        await OrderService.cancellOrder(order);
+        res.send(order);
+    } catch (err) {
+        res.status(status).send(err.message)
+    }
+  });
+
+// axios.post('/user/5ddfc5c47a553c056aad877d/order/5ddfc5c47a553c056aad878d/cancel').then(console.log)
+
+
 //update user's details
 router.post('/:id/update', async(req, res) => {
-    const user = await UserService.find(req.params.id)
-    await UserService.update(req.params.id, req.body)
-    const userOne = await UserService.find(req.params.id)
-    res.send('user ' + userOne.name + ' was updated with ' + userOne.address)
+    const user = await UserService.update(req.params.id, req.body)
+    res.send(user)
 })
 
-//axios.post('/user/5dd1412051db4776931cd847', {address: 'CVC'}).then(console.log)
+
 
 router.delete('/:id', async(req, res) => {
     const user = await UserService.del(req.params.id)
