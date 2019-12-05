@@ -1,0 +1,9 @@
+extends layout
+
+block content
+    h1  #{menu.name}
+    each item, index in menu.food
+        li #{item.name}  - #{menu.price[index]}
+        i(style={color: 'red', 'font-size': '12px', 'tab-size': 12 }) #{item.ingridients}
+    //- This just displays the passed data
+    pre #{JSON.stringify(menu, null, 4)}

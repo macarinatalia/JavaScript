@@ -1,0 +1,13 @@
+extends layout
+
+block content
+    p Info about: #{user.name}
+    p Number of orders: #{orders.length}
+
+    each order, index in orders  
+        li Order #{index + 1} : #{order}
+
+
+    
+       
+    
