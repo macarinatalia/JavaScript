@@ -17,7 +17,7 @@
     "mongoose": "^5.7.11",
     "mongoose-autopopulate": "^0.9.1",
     "nodemon": "^1.19.4",
-    "npm": "^6.13.0",
+    "npm": "^6.13.4",
     "pug": "^2.0.4"
   }
 }
